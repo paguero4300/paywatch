@@ -5,10 +5,13 @@ namespace App\Filament\Resources\PaymentNotifications\Pages;
 use App\Filament\Resources\PaymentNotifications\PaymentNotificationResource;
 use App\Models\PaymentNotification;
 use Filament\Notifications\Notification;
+use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPaymentNotifications extends ListRecords
 {
+    use ExposesTableToWidgets;
+
     protected static string $resource = PaymentNotificationResource::class;
 
     protected static ?string $title = 'Notificaciones de Pago';
@@ -75,5 +78,12 @@ class ListPaymentNotifications extends ListRecords
     public function getSubheading(): ?string
     {
         return 'Actualizándose automáticamente cada 5 segundos';
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\PaymentNotificationStats::class,
+        ];
     }
 }
