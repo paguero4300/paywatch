@@ -88,8 +88,6 @@ class PaymentNotificationsTable
                     ->icon('heroicon-o-clock')
                     ->iconColor('gray')
                     ->sortable()
-                    ->since()
-                    ->description(fn ($record) => $record->created_at->format('d/m/Y H:i:s'))
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
