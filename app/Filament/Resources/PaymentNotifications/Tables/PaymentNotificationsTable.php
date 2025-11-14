@@ -64,24 +64,6 @@ class PaymentNotificationsTable
                     ->tooltip(fn ($state) => $state)
                     ->copyable(),
 
-                TextColumn::make('confidence_level')
-                    ->label('Confianza')
-                    ->badge()
-                    ->color(fn ($state): string => match (true) {
-                        is_numeric($state) && floatval($state) >= 0.9 => 'success',
-                        is_numeric($state) && floatval($state) >= 0.7 => 'warning',
-                        is_numeric($state) && floatval($state) >= 0.5 => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(function ($state) {
-                        if (!$state || !is_numeric($state)) {
-                            return 'N/A';
-                        }
-                        return number_format(floatval($state) * 100, 0) . '%';
-                    })
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-
                 TextColumn::make('created_at')
                     ->label('Fecha y Hora')
                     ->dateTime('d/m/Y H:i:s')
