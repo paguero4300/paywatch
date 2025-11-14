@@ -13,8 +13,7 @@ class ListPaymentNotifications extends ListRecords
 
     protected static ?string $navigationLabel = 'Notificaciones de Pago';
 
-    // Auto-refresh cada 5 segundos (5000 milisegundos)
-    protected static string $pollingInterval = '5s';
+    protected static string $view = 'filament.resources.payment-notifications.pages.list-payment-notifications';
 
     public function getHeading(): string
     {

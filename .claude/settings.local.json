@@ -5,7 +5,10 @@
       "Bash(find:*)",
       "Bash(composer show:*)",
       "Bash(php artisan:*)",
-      "WebFetch(domain:filamentphp.com)"
+      "WebFetch(domain:filamentphp.com)",
+      "mcp__brave-search__brave_web_search",
+      "WebSearch",
+      "WebFetch(domain:livewire.laravel.com)"
     ],
     "deny": [],
     "ask": []
