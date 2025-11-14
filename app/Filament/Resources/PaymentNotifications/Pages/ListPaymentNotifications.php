@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\PaymentNotifications\Pages;
 
 use App\Filament\Resources\PaymentNotifications\PaymentNotificationResource;
+use App\Models\PaymentNotification;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPaymentNotifications extends ListRecords
@@ -14,6 +16,56 @@ class ListPaymentNotifications extends ListRecords
     protected static ?string $navigationLabel = 'Notificaciones de Pago';
 
     protected string $view = 'filament.resources.payment-notifications.pages.list-payment-notifications';
+
+    public ?int $lastRecordId = null;
+
+    public function mount(): void
+    {
+        parent::mount();
+
+        // Inicializar con el ID más reciente al cargar la página
+        $this->lastRecordId = PaymentNotification::query()
+            ->when(
+                !auth()->user()->is_super_admin,
+                fn ($query) => $query->whereHas('device.company', function ($q) {
+                    $q->where('companies.id', \Filament\Facades\Filament::getTenant()?->id);
+                })
+            )
+            ->max('id');
+    }
+
+    public function checkForNewRecords(): void
+    {
+        // Obtener el ID máximo actual
+        $currentMaxId = PaymentNotification::query()
+            ->when(
+                !auth()->user()->is_super_admin,
+                fn ($query) => $query->whereHas('device.company', function ($q) {
+                    $q->where('companies.id', \Filament\Facades\Filament::getTenant()?->id);
+                })
+            )
+            ->max('id');
+
+        // Si hay nuevos registros
+        if ($currentMaxId && $this->lastRecordId && $currentMaxId > $this->lastRecordId) {
+            $newCount = $currentMaxId - $this->lastRecordId;
+
+            Notification::make()
+                ->title('Nuevos pagos recibidos')
+                ->body($newCount === 1 ? '1 nuevo pago registrado' : "{$newCount} nuevos pagos registrados")
+                ->success()
+                ->icon('heroicon-o-banknotes')
+                ->iconColor('success')
+                ->duration(3000)
+                ->send();
+
+            // Actualizar el último ID conocido
+            $this->lastRecordId = $currentMaxId;
+        } elseif ($currentMaxId && !$this->lastRecordId) {
+            // Primera carga
+            $this->lastRecordId = $currentMaxId;
+        }
+    }
 
     public function getHeading(): string
     {
