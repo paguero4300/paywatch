@@ -63,10 +63,20 @@ class PaymentNotificationsTable
                     ->label('Remitente')
                     ->icon('heroicon-o-user')
                     ->iconColor('gray')
+                    ->formatStateUsing(function ($state) {
+                        if (!$state) {
+                            return '-';
+                        }
+                        // Limpiar "Confirmación de Pago" y asteriscos
+                        $cleaned = str_replace(['***', 'Confirmación de Pago'], '', $state);
+                        $cleaned = trim($cleaned);
+
+                        return $cleaned ?: '-';
+                    })
                     ->searchable()
                     ->sortable()
                     ->limit(30)
-                    ->tooltip(fn ($state) => $state)
+                    ->tooltip(fn ($state) => $state ? str_replace(['***', 'Confirmación de Pago'], '', trim($state)) : '-')
                     ->copyable(),
 
                 TextColumn::make('created_at')
