@@ -11,6 +11,8 @@ class PaymentNotificationStats extends BaseWidget
 {
     use InteractsWithPageTable;
 
+    protected static bool $isDiscovered = false;
+
     protected function getTablePage(): string
     {
         return ListPaymentNotifications::class;
