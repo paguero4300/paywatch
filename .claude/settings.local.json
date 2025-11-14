@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cat:*)",
       "Bash(find:*)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "Bash(php artisan:*)"
     ],
     "deny": [],
     "ask": []

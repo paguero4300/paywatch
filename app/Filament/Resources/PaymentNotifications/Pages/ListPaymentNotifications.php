@@ -8,4 +8,21 @@ use Filament\Resources\Pages\ListRecords;
 class ListPaymentNotifications extends ListRecords
 {
     protected static string $resource = PaymentNotificationResource::class;
+
+    protected static ?string $title = 'Notificaciones de Pago';
+
+    protected static ?string $navigationLabel = 'Notificaciones de Pago';
+
+    // Auto-refresh cada 5 segundos (5000 milisegundos)
+    protected static string $pollingInterval = '5s';
+
+    public function getHeading(): string
+    {
+        return 'Notificaciones de Pago';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Actualizándose automáticamente cada 5 segundos';
+    }
 }

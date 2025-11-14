@@ -25,7 +25,11 @@ class PaymentNotificationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    protected static ?string $navigationLabel = 'Pagos';
+    protected static ?string $navigationLabel = 'Notificaciones de Pago';
+
+    protected static ?string $modelLabel = 'Notificación de Pago';
+
+    protected static ?string $pluralModelLabel = 'Notificaciones de Pago';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Operación';
 
