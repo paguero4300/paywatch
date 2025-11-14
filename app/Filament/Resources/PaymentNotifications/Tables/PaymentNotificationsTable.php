@@ -91,13 +91,24 @@ class PaymentNotificationsTable
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
+                Filter::make('hoy')
+                    ->label('Solo Hoy')
+                    ->default()
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today()))
+                    ->indicateUsing(fn (): string => 'Mostrando pagos de hoy'),
+
                 Filter::make('created_at')
-                    ->label('Fecha')
+                    ->label('Rango de Fechas')
                     ->schema([
                         DatePicker::make('created_from')
-                            ->label('Desde'),
+                            ->label('Desde')
+                            ->placeholder('Selecciona fecha inicial')
+                            ->native(false),
                         DatePicker::make('created_until')
-                            ->label('Hasta'),
+                            ->label('Hasta')
+                            ->placeholder('Selecciona fecha final')
+                            ->native(false),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -109,7 +120,35 @@ class PaymentNotificationsTable
                                 $data['created_until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if (!$data['created_from'] && !$data['created_until']) {
+                            return null;
+                        }
+
+                        $from = $data['created_from'] ? \Carbon\Carbon::parse($data['created_from'])->format('d/m/Y') : '...';
+                        $until = $data['created_until'] ? \Carbon\Carbon::parse($data['created_until'])->format('d/m/Y') : '...';
+
+                        return "Rango: {$from} - {$until}";
                     }),
+
+                Filter::make('esta_semana')
+                    ->label('Esta Semana')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [
+                        now()->startOfWeek(),
+                        now()->endOfWeek(),
+                    ]))
+                    ->indicateUsing(fn (): string => 'Mostrando pagos de esta semana'),
+
+                Filter::make('este_mes')
+                    ->label('Este Mes')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth(),
+                    ]))
+                    ->indicateUsing(fn (): string => 'Mostrando pagos de este mes'),
 
                 SelectFilter::make('app')
                     ->label('Aplicación')
