@@ -76,4 +76,14 @@ class ListPaymentNotifications extends ListRecords
     {
         return 'Actualizándose automáticamente cada 5 segundos';
     }
+
+    protected function getTableFiltersFormData(): array
+    {
+        return [
+            'created_at' => [
+                'created_from' => now()->startOfDay()->format('Y-m-d'),
+                'created_until' => now()->endOfDay()->format('Y-m-d'),
+            ],
+        ];
+    }
 }
