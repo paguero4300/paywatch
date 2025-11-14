@@ -13,7 +13,7 @@ class ListPaymentNotifications extends ListRecords
 
     protected static ?string $navigationLabel = 'Notificaciones de Pago';
 
-    protected static string $view = 'filament.resources.payment-notifications.pages.list-payment-notifications';
+    protected string $view = 'filament.resources.payment-notifications.pages.list-payment-notifications';
 
     public function getHeading(): string
     {
