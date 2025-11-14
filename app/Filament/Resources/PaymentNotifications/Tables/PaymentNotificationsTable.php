@@ -45,12 +45,11 @@ class PaymentNotificationsTable
 
                 TextColumn::make('amount')
                     ->label('Monto')
-                    ->money('PEN', locale: 'es_PE')
+                    ->money('PEN')
                     ->icon('heroicon-o-banknotes')
                     ->iconColor('success')
                     ->sortable()
                     ->weight('bold')
-                    ->size('lg')
                     ->color('success')
                     ->copyable()
                     ->tooltip('Click para copiar'),
@@ -69,12 +68,17 @@ class PaymentNotificationsTable
                     ->label('Confianza')
                     ->badge()
                     ->color(fn ($state): string => match (true) {
-                        $state >= 0.9 => 'success',
-                        $state >= 0.7 => 'warning',
-                        $state >= 0.5 => 'danger',
-                        default => 'danger',
+                        is_numeric($state) && floatval($state) >= 0.9 => 'success',
+                        is_numeric($state) && floatval($state) >= 0.7 => 'warning',
+                        is_numeric($state) && floatval($state) >= 0.5 => 'danger',
+                        default => 'gray',
                     })
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state * 100, 0) . '%' : 'N/A')
+                    ->formatStateUsing(function ($state) {
+                        if (!$state || !is_numeric($state)) {
+                            return 'N/A';
+                        }
+                        return number_format(floatval($state) * 100, 0) . '%';
+                    })
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
 
