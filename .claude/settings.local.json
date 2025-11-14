@@ -4,7 +4,8 @@
       "Bash(cat:*)",
       "Bash(find:*)",
       "Bash(composer show:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "WebFetch(domain:filamentphp.com)"
     ],
     "deny": [],
     "ask": []

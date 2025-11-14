@@ -2,9 +2,13 @@
 
 namespace App\Filament\Resources\PaymentNotifications\Tables;
 
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class PaymentNotificationsTable
 {
@@ -52,7 +56,8 @@ class PaymentNotificationsTable
                     ->weight('bold')
                     ->color('success')
                     ->copyable()
-                    ->tooltip('Click para copiar'),
+                    ->tooltip('Click para copiar')
+                    ->summarize(Sum::make()->label('Total')->money('PEN')),
 
                 TextColumn::make('sender')
                     ->label('Remitente')
@@ -75,6 +80,26 @@ class PaymentNotificationsTable
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
+                Filter::make('created_at')
+                    ->label('Fecha')
+                    ->schema([
+                        DatePicker::make('created_from')
+                            ->label('Desde'),
+                        DatePicker::make('created_until')
+                            ->label('Hasta'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
+
                 SelectFilter::make('app')
                     ->label('Aplicación')
                     ->options([
