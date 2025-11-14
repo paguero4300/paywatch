@@ -12,7 +12,7 @@ class PaymentStatsOverview extends BaseWidget
 {
     protected static ?int $sort = 1;
 
-    protected static ?string $pollingInterval = '10s';
+    protected ?string $pollingInterval = '10s';
 
     protected function getStats(): array
     {
