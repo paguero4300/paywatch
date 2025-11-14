@@ -61,8 +61,8 @@ class PaymentNotificationsTable
 
                 TextColumn::make('sender')
                     ->label('Remitente')
-                    ->icon('heroicon-o-user')
-                    ->iconColor('gray')
+                    ->icon('heroicon-o-user-circle')
+                    ->iconColor('primary')
                     ->formatStateUsing(function ($state) {
                         if (!$state) {
                             return '-';
@@ -75,9 +75,12 @@ class PaymentNotificationsTable
                     })
                     ->searchable()
                     ->sortable()
-                    ->limit(30)
+                    ->weight('semibold')
+                    ->color('primary')
+                    ->limit(35)
                     ->tooltip(fn ($state) => $state ? str_replace(['***', 'Confirmación de Pago'], '', trim($state)) : '-')
-                    ->copyable(),
+                    ->copyable()
+                    ->copyMessage('Remitente copiado'),
 
                 TextColumn::make('created_at')
                     ->label('Fecha y Hora')
