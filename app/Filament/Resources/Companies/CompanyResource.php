@@ -21,13 +21,15 @@ class CompanyResource extends Resource
 {
     protected static ?string $model = Company::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Empresas';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Gestión del sistema';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sistema';
 
     public static function scopeToTenant(bool $condition = true): void
     {

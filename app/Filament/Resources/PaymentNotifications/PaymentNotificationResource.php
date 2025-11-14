@@ -21,11 +21,13 @@ class PaymentNotificationResource extends Resource
 {
     protected static ?string $model = PaymentNotification::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    protected static ?string $navigationLabel = 'Notificaciones de Pago';
+    protected static ?string $navigationLabel = 'Pagos';
 
     protected static ?string $modelLabel = 'Notificación de Pago';
 

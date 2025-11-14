@@ -29,7 +29,17 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
+                'success' => Color::Green,
+                'warning' => Color::Amber,
+                'danger' => Color::Red,
+            ])
+            ->brandName('PayWatch')
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups([
+                'Operación',
+                'Configuración',
+                'Sistema',
             ])
             // ==========================================
             // MULTI-TENANCY
