@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Hash;
 
 class DeviceForm
 {
@@ -23,10 +24,11 @@ class DeviceForm
                     ->unique('usuario', 'username', ignoreRecord: true),
                 
                 TextInput::make('password_hash')
-                    ->label('Contraseña')
+                    ->label('Clave')
                     ->password()
                     ->required(fn (string $context): bool => $context === 'create')
-                    ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
+                    ->dehydrateStateUsing(fn ($state) => $state ? Hash::make($state, ['rounds' => 12]) : null)
+                    ->revealable(),
                 
                 TextInput::make('device_id')
                     ->label('ID del dispositivo (App)')
