@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\PaymentNotifications\Tables;
 
-use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -16,7 +15,7 @@ class PaymentNotificationsTable
                 TextColumn::make('device.username')
                     ->label('Dispositivo')
                     ->icon('heroicon-o-device-phone-mobile')
-                    ->iconColor(Color::Blue)
+                    ->iconColor('info')
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
@@ -27,13 +26,13 @@ class PaymentNotificationsTable
                     ->label('Aplicación')
                     ->badge()
                     ->color(fn (string $state): string => match (strtolower($state)) {
-                        'yape' => Color::Amber,
-                        'plin' => Color::Purple,
-                        'tunki' => Color::Green,
-                        'bcp' => Color::Blue,
-                        'interbank' => Color::Sky,
-                        'bbva' => Color::Indigo,
-                        default => Color::Gray,
+                        'yape' => 'warning',
+                        'plin' => 'purple',
+                        'tunki' => 'success',
+                        'bcp' => 'info',
+                        'interbank' => 'primary',
+                        'bbva' => 'indigo',
+                        default => 'gray',
                     })
                     ->icon(fn (string $state): string => match (strtolower($state)) {
                         'yape' => 'heroicon-o-currency-dollar',
@@ -48,18 +47,18 @@ class PaymentNotificationsTable
                     ->label('Monto')
                     ->money('PEN', locale: 'es_PE')
                     ->icon('heroicon-o-banknotes')
-                    ->iconColor(Color::Emerald)
+                    ->iconColor('success')
                     ->sortable()
                     ->weight('bold')
                     ->size('lg')
-                    ->color(Color::Emerald)
+                    ->color('success')
                     ->copyable()
                     ->tooltip('Click para copiar'),
 
                 TextColumn::make('sender')
                     ->label('Remitente')
                     ->icon('heroicon-o-user')
-                    ->iconColor(Color::Gray)
+                    ->iconColor('gray')
                     ->searchable()
                     ->sortable()
                     ->limit(30)
@@ -70,10 +69,10 @@ class PaymentNotificationsTable
                     ->label('Confianza')
                     ->badge()
                     ->color(fn ($state): string => match (true) {
-                        $state >= 0.9 => Color::Green,
-                        $state >= 0.7 => Color::Yellow,
-                        $state >= 0.5 => Color::Orange,
-                        default => Color::Red,
+                        $state >= 0.9 => 'success',
+                        $state >= 0.7 => 'warning',
+                        $state >= 0.5 => 'danger',
+                        default => 'danger',
                     })
                     ->formatStateUsing(fn ($state) => $state ? number_format($state * 100, 0) . '%' : 'N/A')
                     ->sortable()
@@ -83,7 +82,7 @@ class PaymentNotificationsTable
                     ->label('Fecha y Hora')
                     ->dateTime('d/m/Y H:i:s')
                     ->icon('heroicon-o-clock')
-                    ->iconColor(Color::Gray)
+                    ->iconColor('gray')
                     ->sortable()
                     ->since()
                     ->description(fn ($record) => $record->created_at->format('d/m/Y H:i:s'))
