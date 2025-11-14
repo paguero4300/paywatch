@@ -95,9 +95,11 @@ class PaymentNotificationsTable
                     ->label('Fecha')
                     ->schema([
                         DatePicker::make('created_from')
-                            ->label('Desde'),
+                            ->label('Desde')
+                            ->default(now()->startOfDay()),
                         DatePicker::make('created_until')
-                            ->label('Hasta'),
+                            ->label('Hasta')
+                            ->default(now()->endOfDay()),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -109,7 +111,8 @@ class PaymentNotificationsTable
                                 $data['created_until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
-                    }),
+                    })
+                    ->default(),
 
                 SelectFilter::make('app')
                     ->label('Aplicación')
