@@ -62,6 +62,9 @@ class ListPaymentNotifications extends ListRecords
                 ->duration(3000)
                 ->send();
 
+            // Disparar evento para reproducir sonido
+            $this->dispatch('play-notification-sound');
+
             // Actualizar el último ID conocido
             $this->lastRecordId = $currentMaxId;
         } elseif ($currentMaxId && !$this->lastRecordId) {
