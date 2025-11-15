@@ -30,18 +30,17 @@ class PaymentStatsOverview extends BaseWidget
                 fn ($q) => $q->whereIn('user_id', $user->accessibleDevices()->pluck('usuario.id'))
             );
 
-        // Estadísticas de hoy usando el campo timestamp (Unix timestamp)
-        $startOfDay = now()->startOfDay()->timestamp;
-        $endOfDay = now()->endOfDay()->timestamp;
-        $paymentsToday = (clone $query)->whereBetween('timestamp', [$startOfDay, $endOfDay])->count();
-        $amountToday = (clone $query)->whereBetween('timestamp', [$startOfDay, $endOfDay])->sum('amount') ?? 0;
+        // Estadísticas de hoy
+        $today = today();
+        $paymentsToday = (clone $query)->whereDate('created_at', $today)->count();
+        $amountToday = (clone $query)->whereDate('created_at', $today)->sum('amount') ?? 0;
 
         // Total general
         $totalPayments = (clone $query)->count();
         $totalAmount = (clone $query)->sum('amount') ?? 0;
 
-        // Último pago usando timestamp
-        $lastPayment = (clone $query)->orderBy('timestamp', 'desc')->first();
+        // Último pago
+        $lastPayment = (clone $query)->latest('created_at')->first();
 
         return [
             Stat::make('Pagos Hoy', $paymentsToday)
@@ -61,7 +60,7 @@ class PaymentStatsOverview extends BaseWidget
                 ->color('info'),
 
             Stat::make('Último Pago', $lastPayment ? 'S/ ' . number_format($lastPayment->amount, 2) : 'Sin pagos')
-                ->description($lastPayment ? \Carbon\Carbon::createFromTimestamp($lastPayment->timestamp)->diffForHumans() : 'No hay registros')
+                ->description($lastPayment ? $lastPayment->created_at->diffForHumans() : 'No hay registros')
                 ->descriptionIcon('heroicon-o-clock')
                 ->color($lastPayment ? 'warning' : 'gray'),
         ];
@@ -71,12 +70,8 @@ class PaymentStatsOverview extends BaseWidget
     {
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $startTimestamp = $date->startOfDay()->timestamp;
-            $endTimestamp = $date->endOfDay()->timestamp;
-            $count = (clone $query)
-                ->whereBetween('timestamp', [$startTimestamp, $endTimestamp])
-                ->count();
+            $date = today()->subDays($i);
+            $count = (clone $query)->whereDate('created_at', $date)->count();
             $data[] = $count;
         }
 

@@ -28,8 +28,8 @@ class PaymentNotificationStats extends BaseWidget
         $totalAmount = $query->sum('amount') ?? 0;
         $averageAmount = $totalPayments > 0 ? $totalAmount / $totalPayments : 0;
 
-        // Obtener el último pago de los datos filtrados usando timestamp
-        $lastPayment = $query->orderBy('timestamp', 'desc')->first();
+        // Obtener el último pago de los datos filtrados
+        $lastPayment = $query->latest('created_at')->first();
 
         return [
             Stat::make('Total de Pagos', number_format($totalPayments, 0, ',', '.'))
@@ -49,7 +49,7 @@ class PaymentNotificationStats extends BaseWidget
                 ->color('warning'),
 
             Stat::make('Último Pago', $lastPayment ? 'S/ ' . number_format($lastPayment->amount, 2, '.', ',') : 'Sin pagos')
-                ->description($lastPayment ? \Carbon\Carbon::createFromTimestamp($lastPayment->timestamp)->diffForHumans() : 'No hay datos')
+                ->description($lastPayment ? $lastPayment->created_at->diffForHumans() : 'No hay datos')
                 ->descriptionIcon('heroicon-o-clock')
                 ->color($lastPayment ? 'info' : 'gray'),
         ];
@@ -60,9 +60,9 @@ class PaymentNotificationStats extends BaseWidget
         // Obtener los registros filtrados
         $records = $this->getPageTableRecords();
 
-        // Agrupar por hora del día usando timestamp
+        // Agrupar por hora del día
         $grouped = $records->groupBy(function ($record) {
-            return date('H', $record->timestamp);
+            return $record->created_at->format('H');
         })->map->count();
 
         // Crear array de 24 horas

@@ -95,21 +95,17 @@ class PaymentNotificationsTable
                     ->label('Solo Hoy')
                     ->default()
                     ->toggle()
-                    ->query(function (Builder $query): Builder {
-                        $startOfDay = now()->startOfDay()->timestamp;
-                        $endOfDay = now()->endOfDay()->timestamp;
-                        return $query->whereBetween('timestamp', [$startOfDay, $endOfDay]);
-                    })
-                    ->indicateUsing(fn (): string => 'Mostrando pagos de hoy (' . now()->format('d/m/Y') . ')'),
+                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today()))
+                    ->indicateUsing(fn (): string => 'Mostrando pagos de hoy (' . today()->format('d/m/Y') . ')'),
 
-                Filter::make('fecha_pago')
+                Filter::make('created_at')
                     ->label('Rango de Fechas')
                     ->schema([
-                        DatePicker::make('fecha_desde')
+                        DatePicker::make('created_from')
                             ->label('Desde')
                             ->placeholder('Selecciona fecha inicial')
                             ->native(false),
-                        DatePicker::make('fecha_hasta')
+                        DatePicker::make('created_until')
                             ->label('Hasta')
                             ->placeholder('Selecciona fecha final')
                             ->native(false),
@@ -117,21 +113,21 @@ class PaymentNotificationsTable
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['fecha_desde'],
-                                fn (Builder $query, $date): Builder => $query->where('timestamp', '>=', \Carbon\Carbon::parse($date)->startOfDay()->timestamp),
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
-                                $data['fecha_hasta'],
-                                fn (Builder $query, $date): Builder => $query->where('timestamp', '<=', \Carbon\Carbon::parse($date)->endOfDay()->timestamp),
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): ?string {
-                        if (!$data['fecha_desde'] && !$data['fecha_hasta']) {
+                        if (!$data['created_from'] && !$data['created_until']) {
                             return null;
                         }
 
-                        $from = $data['fecha_desde'] ? \Carbon\Carbon::parse($data['fecha_desde'])->format('d/m/Y') : '...';
-                        $until = $data['fecha_hasta'] ? \Carbon\Carbon::parse($data['fecha_hasta'])->format('d/m/Y') : '...';
+                        $from = $data['created_from'] ? \Carbon\Carbon::parse($data['created_from'])->format('d/m/Y') : '...';
+                        $until = $data['created_until'] ? \Carbon\Carbon::parse($data['created_until'])->format('d/m/Y') : '...';
 
                         return "Rango: {$from} - {$until}";
                     }),
@@ -139,21 +135,19 @@ class PaymentNotificationsTable
                 Filter::make('esta_semana')
                     ->label('Esta Semana')
                     ->toggle()
-                    ->query(function (Builder $query): Builder {
-                        $startOfWeek = now()->startOfWeek()->timestamp;
-                        $endOfWeek = now()->endOfWeek()->timestamp;
-                        return $query->whereBetween('timestamp', [$startOfWeek, $endOfWeek]);
-                    })
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [
+                        now()->startOfWeek(),
+                        now()->endOfWeek(),
+                    ]))
                     ->indicateUsing(fn (): string => 'Mostrando pagos de esta semana'),
 
                 Filter::make('este_mes')
                     ->label('Este Mes')
                     ->toggle()
-                    ->query(function (Builder $query): Builder {
-                        $startOfMonth = now()->startOfMonth()->timestamp;
-                        $endOfMonth = now()->endOfMonth()->timestamp;
-                        return $query->whereBetween('timestamp', [$startOfMonth, $endOfMonth]);
-                    })
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth(),
+                    ]))
                     ->indicateUsing(fn (): string => 'Mostrando pagos de este mes'),
 
                 SelectFilter::make('app')
