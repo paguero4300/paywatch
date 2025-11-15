@@ -20,38 +20,47 @@ class ListPaymentNotifications extends ListRecords
 
     protected string $view = 'filament.resources.payment-notifications.pages.list-payment-notifications';
 
-    public ?int $lastRecordId = null;
+    public ?int $lastPaymentTimestamp = null;
 
     public function mount(): void
     {
         parent::mount();
 
-        // Inicializar con el ID más reciente al cargar la página
-        $this->lastRecordId = PaymentNotification::query()
+        // Inicializar con el timestamp más reciente al cargar la página
+        $this->lastPaymentTimestamp = PaymentNotification::query()
             ->when(
                 !auth()->user()->is_super_admin,
                 fn ($query) => $query->whereHas('device.company', function ($q) {
                     $q->where('companies.id', \Filament\Facades\Filament::getTenant()?->id);
                 })
             )
-            ->max('id');
+            ->max('timestamp');
     }
 
     public function checkForNewRecords(): void
     {
-        // Obtener el ID máximo actual
-        $currentMaxId = PaymentNotification::query()
+        // Obtener el timestamp máximo actual (fecha real del pago)
+        $currentMaxTimestamp = PaymentNotification::query()
             ->when(
                 !auth()->user()->is_super_admin,
                 fn ($query) => $query->whereHas('device.company', function ($q) {
                     $q->where('companies.id', \Filament\Facades\Filament::getTenant()?->id);
                 })
             )
-            ->max('id');
+            ->max('timestamp');
 
-        // Si hay nuevos registros
-        if ($currentMaxId && $this->lastRecordId && $currentMaxId > $this->lastRecordId) {
-            $newCount = $currentMaxId - $this->lastRecordId;
+        // Si hay nuevos registros (timestamp más reciente)
+        if ($currentMaxTimestamp && $this->lastPaymentTimestamp && $currentMaxTimestamp > $this->lastPaymentTimestamp) {
+            // Contar cuántos pagos nuevos hay
+            $newCount = PaymentNotification::query()
+                ->when(
+                    !auth()->user()->is_super_admin,
+                    fn ($query) => $query->whereHas('device.company', function ($q) {
+                        $q->where('companies.id', \Filament\Facades\Filament::getTenant()?->id);
+                    })
+                )
+                ->where('timestamp', '>', $this->lastPaymentTimestamp)
+                ->count();
 
             Notification::make()
                 ->title('Nuevos pagos recibidos')
@@ -62,11 +71,11 @@ class ListPaymentNotifications extends ListRecords
                 ->duration(3000)
                 ->send();
 
-            // Actualizar el último ID conocido
-            $this->lastRecordId = $currentMaxId;
-        } elseif ($currentMaxId && !$this->lastRecordId) {
+            // Actualizar el último timestamp conocido
+            $this->lastPaymentTimestamp = $currentMaxTimestamp;
+        } elseif ($currentMaxTimestamp && !$this->lastPaymentTimestamp) {
             // Primera carga
-            $this->lastRecordId = $currentMaxId;
+            $this->lastPaymentTimestamp = $currentMaxTimestamp;
         }
     }
 
