@@ -1,4 +1,4 @@
-<div
+<x-filament-panels::page
     wire:poll.5s="checkForNewRecords"
     x-data="{
         soundEnabled: false,
@@ -12,7 +12,6 @@
             if (!this.soundEnabled) {
                 this.audio = new Audio('/sounds/notification.mp3');
                 this.audio.volume = 0.5;
-
                 this.audio.play().then(() => {
                     this.soundEnabled = true;
                     localStorage.setItem('payment_sounds_enabled', 'true');
@@ -30,50 +29,37 @@
 
         playNotificationSound() {
             if (!this.soundEnabled) return;
-
             if (!this.audio) {
                 this.audio = new Audio('/sounds/notification.mp3');
                 this.audio.volume = 0.5;
             }
-
             this.audio.currentTime = 0;
-            this.audio.play().catch(error => {
-                console.log('Error al reproducir:', error);
-            });
+            this.audio.play().catch(error => console.log('Error:', error));
         }
     }"
     x-on:play-notification-sound.window="playNotificationSound()"
 >
-    <x-filament-panels::page>
-        <x-slot name="headerActions">
-            <button
-                type="button"
-                @click="toggleSound()"
-                class="fi-btn relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 rounded-lg fi-color-custom fi-btn-color-primary fi-size-md fi-btn-size-md gap-1.5 px-3 py-2 text-sm inline-grid shadow-sm"
-                :class="soundEnabled
-                    ? 'bg-custom-600 text-white hover:bg-custom-500 focus-visible:ring-custom-500/50 dark:bg-custom-500 dark:hover:bg-custom-400 dark:focus-visible:ring-custom-400/50'
-                    : 'bg-gray-800 text-white hover:bg-gray-700 focus-visible:ring-gray-700/50'"
-                :style="soundEnabled ? '--c-400:var(--success-400);--c-500:var(--success-500);--c-600:var(--success-600);' : ''"
-            >
-                <svg
-                    class="fi-btn-icon h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                >
-                    <template x-if="soundEnabled">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-                    </template>
-                    <template x-if="!soundEnabled">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-                    </template>
-                </svg>
-                <span class="fi-btn-label" x-text="soundEnabled ? 'Sonidos On' : 'Sonidos Off'"></span>
-            </button>
-        </x-slot>
+    <!-- Botón de sonido ARRIBA de todo -->
+    <div class="mb-4 flex justify-end">
+        <button
+            type="button"
+            @click="toggleSound()"
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium text-xs shadow-sm transition text-white"
+            :class="soundEnabled ? 'bg-green-600 hover:bg-green-500' : 'bg-gray-700 hover:bg-gray-600'"
+            style="display: inline-flex; align-items: center;"
+        >
+            <!-- Icono de volumen ON -->
+            <svg x-show="soundEnabled" style="width: 14px; height: 14px;" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.414A2 2 0 014.293 13H3a1 1 0 01-1-1V8a1 1 0 011-1h1.293a2 2 0 001.293-.414l7-7a1 1 0 011.414 0l.293.293z"/>
+            </svg>
+            <!-- Icono de volumen OFF -->
+            <svg x-show="!soundEnabled" style="width: 14px; height: 14px;" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+            </svg>
+            <span x-text="soundEnabled ? 'Sonidos Activados' : 'Activar Sonidos'"></span>
+        </button>
+    </div>
 
-        {{ $this->table }}
-    </x-filament-panels::page>
-</div>
+    {{ $this->table }}
+</x-filament-panels::page>
